@@ -1,0 +1,27 @@
+{
+  "name": "blog-server",
+  "version": "1.0.0",
+  "description": "Express Sever",
+  "author": "vincent",
+  "private": true,
+  "scripts": {
+    "server": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.17.2",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.4",
+    "express": "^4.14.1",
+    "express-session": "^1.15.6",
+    "jsonwebtoken": "^8.0.1",
+    "mongoosastic": "^4.3.0",
+    "mongoose": "^5.0.10",
+    "morgan": "^1.8.2",
+    "multer": "^1.3.0",
+    "parseurl": "^1.3.2",
+    "serve-favicon": "^2.4.5",
+    "socket.io": "^2.0.4"
+  }
+}
