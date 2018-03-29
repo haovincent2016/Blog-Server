@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const Article = require('./article')
 const Tag = require('./tag')
+const Message = require('./message')
 const Schema = mongoose.Schema
 const bcrypt = require('bcrypt-nodejs')
 
@@ -31,6 +32,23 @@ var userSchema = new Schema({
     created_at: { 
         type : Date, 
         default : Date.now 
+    },
+    //message
+    online_status: {
+        type: Boolean,
+        default: false
+    },
+    last_login: {
+        type: Date,
+        default: Date.now
+    },
+    //message write by user, sent to others
+    messages: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Message'
+    }],
+    socketid: {
+        type: String
     },
     //state
     status: {

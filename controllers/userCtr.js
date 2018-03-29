@@ -1,5 +1,8 @@
 const User = require('../models/user')
 const Article = require('../models/article')
+const Message = require('../models/message')
+const Friend = require('../models/friend')
+const Apply = require('../models/apply')
 const jwt = require('jsonwebtoken')
 const config = require('../config')
 const helper = require('../router/helper')
@@ -167,6 +170,167 @@ class UserCtr {
             }
         } catch(err) {
             return res.json({ success: false, message: 'error occurs' })
+        }
+    }
+
+    /* chat part */
+    async getFriends(req, res) {
+        try {
+            const result = await Friend.find({ $or: [{one: req.params.id}, {another: req.params.id }] })
+                .populate({ path: 'one', select: 'name avatar' })
+                .populate({ path: 'another', select: 'name avatar' })
+            if(!result.length) {
+                return res.send({ success: false })
+            } else {
+                return res.send({ success: true, result: result })
+            }
+        } catch(err) {
+            return res.send({ success: false, message: 'error occurs' })
+        }
+    }
+
+    async checkState(req, res) {
+        try {
+            const result = await Friend.find({ $or: [{one: req.query.from, another: req.query.to}, {one: req.query.to, another: req.query.from }] })
+            if(!result.length) {
+                return res.send({ success: false })
+            } else {
+                return res.send({ success: true })
+            }
+        } catch(err) {
+            return res.send({ success: false, message: 'error occurs' }) 
+        }
+    }
+
+    async checkApply(req, res) {
+        try {
+            const result = await Apply.findOne({ from: req.query.from, to: req.query.to})
+            if(!result) {
+                return res.send({ success: false })
+            } else {
+                return res.send({ success: true, request: result })
+            }
+        } catch(err) {
+            return res.send({ success: false, message: 'error occurs' }) 
+        }
+    }
+
+    async getRequests(req, res) {
+        try {
+            const result = await Apply.find({ to: req.params.id, state: 'pending' })
+            if(!result.length) {
+                return res.send({ success: false })
+            } else {
+                return res.send({ success: true, result: result })
+            }
+        } catch(err) {
+            return res.send({ success: false, message: 'error occurs' })
+        }
+    }
+
+    async sendRequest(req, res) {
+        try {
+            const newApply = new Apply()
+            newApply.from = req.body.from
+            newApply.to = req.body.to
+            newApply.send_time = req.body.send_time
+            const saved = await newApply.save()
+            if(!saved) {
+                return res.send({ success: false, message: 'failed to send friend request' })
+            } else {
+                return res.send({ success: true, message: 'you have sent friend request' })
+            }
+        } catch(err) {
+            return res.send({ success: false, message: 'error occurs' })
+        }
+    }
+
+    async acceptRequest(req, res) {
+        try {
+            const result = await Apply.findByIdAndUpdate(req.params.id, { $set: {state: 'accepted'}}, { new: true })
+            const newFriend = new Friend({ one: result.from, another: result.to, friend_time: Date.parse(new Date()) })
+            const friend = await newFriend.save()
+            if(!result || !friend) {
+                return res.send({ success: false }) 
+            } else {
+                return res.send({ success: true })
+            }
+        } catch(err) {
+            return res.send({ success: false, message: 'error occurs' })
+        }
+    }
+
+    async rejectRequest(req, res) {
+        try {
+            const result = await Apply.findByIdAndUpdate(req.params.id, { $set: {state: 'rejected'}}, { new: true })
+            if(!result) {
+                return res.send({ success: false }) 
+            } else {
+                return res.send({ success: true })
+            }
+        } catch(err) {
+            return res.send({ success: false, message: 'error occurs' })
+        }
+    }
+
+    async getMessages(req, res) {
+        try {
+            const result = await Message.find({ $or: [{from: req.query.userId, to: req.query.otherId}, {from: req.query.otherId, to: req.query.userId}] })
+                .sort({send_time: -1})
+                .limit(1)
+            if(!result.length) {
+                return res.send({ success: false })  
+            } else {
+                return res.send({ success: true, result: result })
+            }
+        } catch(err) {
+            return res.send({ success: false, message: 'error occurs' })
+        }
+    }
+    async getUserMessages(req, res) {
+        try {   
+            const message = await Message.find({ 
+                $or: [{from: req.query.otherId, to: req.query.userId}, {from: req.query.userId, to: req.query.otherId}] 
+            })
+                .populate({ path: 'from', select: 'name avatar' })
+                .populate({ path: 'to', select: 'name avatar' })
+            const user = await User.findById(req.query.otherId)
+            const userinfo = helper.userInfo(user)
+            return res.send({
+                success: true,
+                message: message,
+                user: userinfo
+            })
+        } catch(err) {
+            return res.send({ success: false, message: 'error occurs' })
+        }
+    }
+    async sendUserMessage(req, res) {
+        try {
+            const newMessage = new Message()
+            newMessage.from = req.body.userId
+            newMessage.to = req.body.otherId
+            newMessage.content = req.body.content
+            newMessage.send_time = req.body.time
+            //display error in console, but no effects
+            const result = await newMessage.save()
+            const message = await Message.findById(result._id).populate({path: 'from', select: 'name avatar'})
+            if(!message) {
+                return res.send({
+                    success: false,
+                    message: 'no messages found'
+                })
+            } else {
+                return res.send({
+                    success: true,
+                    message: message
+                })
+            }
+        } catch(err) {
+            return res.send({
+                success: false,
+                message: 'error occurs'
+            })
         }
     }
 

@@ -1,6 +1,6 @@
 module.exports = {
     secret: 'asdff8sdasws81as',
-    shortExpire: 3 * 60 * 60 * 1000, //3 hours
+    shortExpire: 24 * 60 * 60 * 1000, //1 day
     longExpire: 7 * 24 * 60 * 60 * 1000, //7 days
     url: 'mongodb://localhost:27017/vincent',
     session: {

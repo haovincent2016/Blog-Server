@@ -53,4 +53,26 @@ router.post('/uploadAvatar', (req, res) => {
 
 router.get('/users', UserCtr.searchUsers)
 
+//get all messages
+router.get('/messages', UserCtr.getMessages)
+//get one to one messages
+router.get('/messages/onetoone', UserCtr.getUserMessages)
+//send one to one message
+router.post('/messages/sendtoone', UserCtr.sendUserMessage)
+
+//all friends
+router.get('/list/:id', UserCtr.getFriends)
+//check if two are friends
+router.get('/state', UserCtr.checkState)
+//all friend requests
+router.get('/friends/:id', UserCtr.getRequests)
+//get one to another request
+router.get('/applystate', UserCtr.checkApply)
+//send friend request
+router.post('/friends/apply', UserCtr.sendRequest)
+//accept friend request
+router.post('/friends/accept/:id', UserCtr.acceptRequest)
+//reject friend request
+router.post('/friends/reject/:id', UserCtr.rejectRequest)
+
 module.exports = router
