@@ -53,7 +53,7 @@ class Commentctr {
                 }
             }
             if(sort_by === 'negative') {
-                const comments = Comment.find({ article: article_id })
+                const comments = await Comment.find({ article: article_id })
                     .sort({ post_date: 1 })
                     .populate('post_by')
                     .populate('reply_to')
@@ -71,7 +71,7 @@ class Commentctr {
                 }
             }
             if(sort_by === 'likes') {
-                const comments = Comment.find({ article: article_id })
+                const comments = await Comment.find({ article: article_id })
                     .sort({ likes: -1 })
                     .populate('post_by')
                     .populate('reply_to')
@@ -93,7 +93,7 @@ class Commentctr {
         }
     }
 
-    async getAuthorComments() {
+    async getAuthorComments(req, res) {
         try {
             const comments = await Comment.find({ article: req.query.articleid, post_by: req.query.authorid, first: true })
                 .populate('post_by')
@@ -111,7 +111,7 @@ class Commentctr {
         }
     }
 
-    async getNumber() {
+    async getNumber(req, res) {
         try {
             const count = await Comment.find({ article: req.query.articleid }).count()
             return res.json(count)
@@ -120,7 +120,7 @@ class Commentctr {
         }
     }
 
-    async getComment() {
+    async getComment(req, res) {
         try {
             const comment = await Comment.findById(req.params.id)
                 .sort({ post_date: -1 })
@@ -132,7 +132,7 @@ class Commentctr {
         }
     }
 
-    async addLike() {
+    async addLike(req, res) {
         try {
             const likes = await Comment.findByIdAndUpdate(req.body.comment, { $inc: { likes: 1 } }, { new: true }).select('likes')
             return res.json(likes)
@@ -141,7 +141,7 @@ class Commentctr {
         }
     }
 
-    async cancelLike() {
+    async cancelLike(req, res) {
         try {
             const likes = await Comment.findByIdAndUpdate(req.body.comment, { $inc: { likes: -1 } }, { new: true }).select('likes')
             return res.json(likes)
@@ -150,7 +150,7 @@ class Commentctr {
         }
     }
 
-    async postComment() {
+    async postComment(req, res) {
         try {
             const newComment = new Comment()
             newComment.content = req.body.content
@@ -163,7 +163,7 @@ class Commentctr {
         }
     }
 
-    async postSubcomment() {
+    async postSubcomment(req, res) {
         try {
             const newSub = new Comment()
             newSub.content = req.body.content
@@ -178,7 +178,7 @@ class Commentctr {
         }
     }
 
-    async addToComment() {
+    async addToComment(req, res) {
         try {
             await Comment.findByIdAndUpdate(req.body.comment, { $push: { subcomments: req.body.subid } })
             return res.json({ success: true })
@@ -187,10 +187,10 @@ class Commentctr {
         }
     }
 
-    async updateRecord() {
+    async updateRecord(req, res) {
         try {
             if(req.body.add) {
-                const comment = Article.findByIdAndUpdate(req.body.articleid, { $inc: { comment: 1 } }, { new: true })
+                const comment = await Article.findByIdAndUpdate(req.body.articleid, { $inc: { comment: 1 } }, { new: true })
                     .select({ comment: 1 })
                 return res.json({ success: true, comment: comment })
             } else {
@@ -203,7 +203,7 @@ class Commentctr {
         }
     }
 
-    async closeComment() {
+    async closeComment(req, res) {
         try {
             await Article.findByIdAndUpdate(req.body.articleid, { $set: { close_comments: req.body.close } })
             return res.json({ success: true })
