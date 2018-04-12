@@ -16,6 +16,7 @@ const article = require('./router/article')
 const collection = require('./router/collection')
 const comment = require('./router/comment')
 const admin = require('./router/admin')
+const danmaku = require('./router/danmaku')
 
 //mongoose
 mongoose.Promise = global.Promise
@@ -41,6 +42,7 @@ app.use('/c', collection)
 app.use('/m', comment)
 app.use('/auth', user)
 app.use('/admin', admin)
+app.use('/d', danmaku)
 
 //socket io
 io.on('connection', (socket) => {
