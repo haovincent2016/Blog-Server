@@ -6,17 +6,22 @@ const helper = require('../router/helper')
 class Admin {
     async registerAdmin(req, res) {
         try {
-            var newAdmin = new User()
-            newAdmin.name = req.body.name
-            newAdmin.email = req.body.email
-            newAdmin.password = newAdmin.generateHash(req.body.password)
-            newAdmin.type="admin"
-            const saved = await newAdmin.save()
-            if(saved) {
-                const admintoken = helper.signLongJWT({ name: req.body.name, email: req.body.email, password: req.body.password })
-                return res.json({ success: true, admintoken: admintoken, message: 'registration success and login directly' })
+            const user = await User.findOne({ 'email': req.body.email })
+            if(!user) {
+                var newAdmin = new User()
+                newAdmin.name = req.body.name
+                newAdmin.email = req.body.email
+                newAdmin.password = newAdmin.generateHash(req.body.password)
+                newAdmin.type="admin"
+                const saved = await newAdmin.save()
+                if(saved) {
+                    const admintoken = helper.signLongJWT({ name: req.body.name, email: req.body.email, type: 'admin' })
+                    return res.json({ success: true, admintoken: admintoken, message: 'registration success and login directly' })
+                } else {
+                    return res.json({ success: false, message: 'save error' })
+                }
             } else {
-                return res.json({ success: false, message: 'save error' })
+                return res.json({ success: false, message: 'admin already exists with this email' })     
             }
         } catch(err) {
             return res.json({ success: false, message: 'error occurs' })
@@ -25,14 +30,14 @@ class Admin {
 
     async loginAdmin(req, res) {
         try {
-            const user = await User.findOne({ 'name': req.body.name, 'type': 'admin' })
+            const user = await User.findOne({ 'email': req.body.email, 'type': 'admin' })
             if(!user) {
                 return res.json({ success: false, message: 'admin not exist' })
             }
             if(!user.verifyPassword(req.body.password)) {
                 return res.json({ success: false, message: 'password is incorrect' })
             }
-            const admintoken = helper.signLongJWT({ name: req.body.name, password: req.body.password, type: 'admin' })
+            const admintoken = helper.signLongJWT({ name: req.body.name, email: req.body.email, type: 'admin' })
             return res.json({ success: true, message: 'admin login succss', id: user._id, avatar: user.avatar, admintoken: admintoken })
         } catch(err) {
             return res.json({ success: false, message: 'error occurs' })
@@ -41,7 +46,7 @@ class Admin {
 
     async loginJWT(req, res) {
         try {
-            const user = await User.findOne({ 'name': req.user.name })
+            const user = await User.findOne({ 'email': req.user.email })
             if(!user) {
                 return res.json({ success: false, message: 'admin not found'})
             }
