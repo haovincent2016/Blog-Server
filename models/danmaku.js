@@ -5,6 +5,10 @@ const danmakuSchema = mongoose.Schema({
     player: {
         type: String, index: true
     },
+    date: { 
+        type : Date, 
+        default : Date.now 
+    },
     author: String,
     time: Number,
     text: String,

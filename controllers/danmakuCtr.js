@@ -5,7 +5,6 @@ const helper = require('../router/helper')
 const redis = require('../redis')
 const logger = require('../logger')
 const blank = require('../blank')
-
 let postIP = []
 
 function htmlEncode (str) {
@@ -47,7 +46,7 @@ class Danmakuctr {
                 res.send(JSON.stringify({
                     code: 0,
                     version: 2,
-                    danmaku: data.map(item => [item.time, typeMap[item.type], item.color, item.author, item.text])
+                    danmaku: data
                 }))
             }
             else {
@@ -70,7 +69,7 @@ class Danmakuctr {
                     res.send(JSON.stringify({
                         code: 0,
                         version: 2,
-                        danmaku: data.map(item => [item.time, typeMap[item.type], item.color, item.author, item.text])
+                        danmaku: data
                     }))
                 })
             }
@@ -78,6 +77,7 @@ class Danmakuctr {
     }
 
     postDanmaku(req, res) {
+        console.log(req.body)
         var body = ''
         var jsonStr = {}
         var ip = req.headers['x-forwarded-for'] ||
@@ -104,13 +104,12 @@ class Danmakuctr {
                 postIP.splice(0, 1)
             }, 4000)
         }
-        
+
         try {
             jsonStr = req.body
         } catch (err) {
             jsonStr = {}
         }
-        
         
         if (jsonStr.player === undefined
             || jsonStr.author === undefined

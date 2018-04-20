@@ -4,6 +4,12 @@ const Article = require('./article')
 const Schema = mongoose.Schema
 
 const commentSchema = mongoose.Schema({
+    //add types to comment
+    type: {
+        type: String,
+        enum: ['article', 'video', 'music'],
+        default: 'article'
+    },
     article: {
         type: Schema.Types.ObjectId,
         ref: 'Article'
@@ -28,9 +34,10 @@ const commentSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
-    approved: {
+    //when not valid, hide comment
+    valid: {
         type: Boolean,
-        default: false
+        default: true
     },
     //primary comment or secondary comment
     first: {

@@ -4,6 +4,12 @@ const Article = require('./article')
 const Schema = mongoose.Schema
 
 const collectionSchema = mongoose.Schema({
+    //add types to collection
+    type: {
+        type: String,
+        enum: ['article', 'video', 'music'],
+        default: 'article'
+    },
     owner: {
         type: Schema.Types.ObjectId,
         ref: 'User'
