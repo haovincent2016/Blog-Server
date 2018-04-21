@@ -46,7 +46,7 @@ class Danmakuctr {
                 res.send(JSON.stringify({
                     code: 0,
                     version: 2,
-                    danmaku: data
+                    danmaku: data.map(item => [item.time, typeMap[item.type], item.color, item.author, item.text, item.date])
                 }))
             }
             else {
@@ -69,7 +69,7 @@ class Danmakuctr {
                     res.send(JSON.stringify({
                         code: 0,
                         version: 2,
-                        danmaku: data
+                        danmaku: data.map(item => [item.time, typeMap[item.type], item.color, item.author, item.text, item.date])
                     }))
                 })
             }
@@ -77,7 +77,6 @@ class Danmakuctr {
     }
 
     postDanmaku(req, res) {
-        console.log(req.body)
         var body = ''
         var jsonStr = {}
         var ip = req.headers['x-forwarded-for'] ||
