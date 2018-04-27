@@ -18,6 +18,7 @@ npm run server
 rs
 
 # setup redis server first for danmaku support 
+# also, uncomment redis/index.js to enable redis
 
 # nginx configuration sample for proxying
 # for apis

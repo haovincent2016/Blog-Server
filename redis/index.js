@@ -1,4 +1,4 @@
-const logger = require('../logger')
+/* const logger = require('../logger')
 const redis = require('redis')
 
 const client = redis.createClient()
@@ -14,4 +14,4 @@ module.exports = {
         logger.info('Set redis: ' + key)
     },
     client: client
-}
+} */
